@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reynolds Flow Lab</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">2D Cylinder Wake Simulator</p>
+          <h1>Reynolds Flow Lab</h1>
+          <p class="lead">
+            円柱後流の見え方を、Reynolds 数と合わせて観察するためのブラウザベース流体シミュレーターです。
+          </p>
+        </div>
+        <div class="header-note">
+          <span>モデル: D2Q9 LBM</span>
+          <span>対象: 層流〜周期渦放出〜3D 遷移閾値の手前</span>
+        </div>
+      </header>
+
+      <main class="layout-grid">
+        <aside class="panel controls-panel">
+          <section>
+            <h2>設定</h2>
+            <label class="field">
+              <span>プリセット</span>
+              <select id="presetSelect"></select>
+            </label>
+
+            <label class="field">
+              <span>流入速度 <strong id="velocityValue">0.050</strong></span>
+              <input id="velocityRange" type="range" min="0.02" max="0.08" step="0.002" />
+            </label>
+
+            <label class="field">
+              <span>粘性 <strong id="viscosityValue">0.018</strong></span>
+              <input id="viscosityRange" type="range" min="0.01" max="0.04" step="0.001" />
+            </label>
+
+            <label class="field">
+              <span>円柱径 <strong id="diameterValue">24</strong></span>
+              <input id="diameterRange" type="range" min="16" max="34" step="1" />
+            </label>
+
+            <label class="field">
+              <span>1フレームあたりの更新回数 <strong id="stepsValue">2</strong></span>
+              <input id="stepsRange" type="range" min="1" max="4" step="1" />
+            </label>
+          </section>
+
+          <section>
+            <h2>表示</h2>
+            <div class="radio-group">
+              <label><input type="radio" name="viewMode" value="speed" />速度</label>
+              <label><input type="radio" name="viewMode" value="vorticity" checked />渦度</label>
+            </div>
+            <label class="checkbox-row">
+              <input id="streamlineToggle" type="checkbox" checked />
+              <span>流線オーバーレイ</span>
+            </label>
+          </section>
+
+          <section>
+            <h2>操作</h2>
+            <div class="button-row">
+              <button id="playButton" type="button">再生</button>
+              <button id="pauseButton" type="button">停止</button>
+            </div>
+            <div class="button-row">
+              <button id="stepButton" type="button">1 step</button>
+              <button id="resetButton" type="button">再初期化</button>
+            </div>
+            <button id="snapshotButton" type="button" class="full-button">PNG 保存</button>
+            <p class="muted-text">スライダー変更時は自動で再初期化されます。</p>
+          </section>
+        </aside>
+
+        <section class="panel viewer-panel">
+          <div class="viewer-header">
+            <div>
+              <h2>シミュレーション</h2>
+              <p>円柱後流の 2D 可視化</p>
+            </div>
+            <div class="badge-row">
+              <span class="badge" id="statusBadge">待機中</span>
+              <span class="badge" id="reBadge">Re 0.0</span>
+            </div>
+          </div>
+          <canvas id="fieldCanvas" aria-label="流れ場の可視化"></canvas>
+          <canvas id="legendCanvas" width="260" height="28" aria-label="カラースケール"></canvas>
+        </section>
+
+        <aside class="panel metrics-panel">
+          <section>
+            <h2>観測値</h2>
+            <dl class="metric-list">
+              <div><dt>Iteration</dt><dd id="iterationMetric">0</dd></div>
+              <div><dt>Probe (uy)</dt><dd id="probeMetric">0.0000</dd></div>
+              <div><dt>平均速度</dt><dd id="averageSpeedMetric">0.0000</dd></div>
+              <div><dt>最大速度</dt><dd id="maxSpeedMetric">0.0000</dd></div>
+              <div><dt>最大渦度</dt><dd id="maxVorticityMetric">0.0000</dd></div>
+            </dl>
+          </section>
+
+          <section>
+            <div class="section-headline">
+              <h2>プローブ信号</h2>
+              <span>円柱後方の横速度</span>
+            </div>
+            <canvas id="probeCanvas" width="320" height="160" aria-label="プローブ信号"></canvas>
+          </section>
+
+          <section>
+            <h2>現象メモ</h2>
+            <div id="phenomenonNote" class="note-box"></div>
+          </section>
+        </aside>
+      </main>
+
+      <footer class="page-footer">
+        <p>
+          詳細は README.md と docs/ を参照してください。これは教育用の 2D モデルであり、3D 乱流解析そのものを置き換えるものではありません。
+        </p>
+      </footer>
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

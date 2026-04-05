@@ -1,0 +1,279 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #09090b;
+  color: #f4f4f5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, rgba(59, 130, 246, 0.12), transparent 36%), #09090b;
+  color: #f4f4f5;
+}
+
+button,
+select,
+input {
+  font: inherit;
+}
+
+.page-shell {
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 12px;
+  font-size: clamp(2rem, 4vw, 2.6rem);
+}
+
+.lead {
+  margin-bottom: 0;
+  max-width: 720px;
+  color: #d4d4d8;
+}
+
+.header-note {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.6);
+  color: #cbd5e1;
+  min-width: 260px;
+}
+
+.layout-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 300px minmax(0, 1fr) 320px;
+}
+
+.panel {
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: 0 12px 30px rgba(2, 6, 23, 0.28);
+  padding: 18px;
+}
+
+.panel section + section {
+  margin-top: 22px;
+}
+
+.controls-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.field strong {
+  color: #f8fafc;
+}
+
+input[type='range'] {
+  width: 100%;
+}
+
+select,
+button {
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(30, 41, 59, 0.85);
+  color: #f8fafc;
+  padding: 10px 12px;
+}
+
+button:hover,
+select:hover {
+  border-color: rgba(96, 165, 250, 0.45);
+}
+
+.button-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.full-button {
+  width: 100%;
+}
+
+.radio-group {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.checkbox-row,
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #d4d4d8;
+}
+
+.viewer-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.viewer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.viewer-header p {
+  margin-bottom: 0;
+  color: #94a3b8;
+}
+
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 7px 12px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  color: #e2e8f0;
+}
+
+#fieldCanvas {
+  width: 100%;
+  height: auto;
+  max-height: 560px;
+  display: block;
+  border-radius: 14px;
+  background: #020617;
+}
+
+#legendCanvas,
+#probeCanvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+  background: #020617;
+}
+
+.metric-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.metric-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.metric-list dt {
+  color: #a1a1aa;
+}
+
+.metric-list dd {
+  margin: 0;
+  color: #f8fafc;
+  font-variant-numeric: tabular-nums;
+}
+
+.section-headline {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.section-headline span,
+.muted-text {
+  color: #94a3b8;
+  font-size: 0.92rem;
+}
+
+.note-box {
+  border-radius: 12px;
+  padding: 14px;
+  background: rgba(2, 6, 23, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  color: #d4d4d8;
+}
+
+.note-box h3 {
+  margin-bottom: 10px;
+  font-size: 1rem;
+}
+
+.note-box p:last-child {
+  margin-bottom: 0;
+}
+
+.note-box .caution {
+  color: #fbbf24;
+}
+
+.page-footer {
+  margin-top: 18px;
+  color: #94a3b8;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 1240px) {
+  .layout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header {
+    flex-direction: column;
+  }
+
+  .header-note {
+    min-width: 0;
+    width: 100%;
+  }
+}

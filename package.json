@@ -1,0 +1,10 @@
+{
+  "name": "reynolds-flow-lab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node tools/dev-server.js",
+    "test": "node --test"
+  }
+}
