@@ -10,15 +10,16 @@
     <div class="page-shell">
       <header class="page-header">
         <div>
-          <p class="eyebrow">2D Cylinder Wake Simulator</p>
+          <p class="eyebrow">3D Cylinder Wake Simulator</p>
           <h1>Reynolds Flow Lab</h1>
           <p class="lead">
-            円柱後流の見え方を、Reynolds 数と合わせて観察するためのブラウザベース流体シミュレーターです。
+            円柱後流を 3D 格子で計算し、断面スライスと volume preview を並べて観察するブラウザベース流体シミュレーターです。
           </p>
         </div>
         <div class="header-note">
-          <span>モデル: D2Q9 LBM</span>
-          <span>対象: 層流〜周期渦放出〜3D 遷移閾値の手前</span>
+          <span>モデル: D3Q19 LBM</span>
+          <span>表示: XY / XZ / YZ slice + 3D wake view</span>
+          <span>対象: 教育用の compact 3D wake 可視化</span>
         </div>
       </header>
 
@@ -32,35 +33,58 @@
             </label>
 
             <label class="field">
-              <span>流入速度 <strong id="velocityValue">0.050</strong></span>
+              <span>流入速度 <strong id="velocityValue">0.056</strong></span>
               <input id="velocityRange" type="range" min="0.02" max="0.08" step="0.002" />
             </label>
 
             <label class="field">
-              <span>粘性 <strong id="viscosityValue">0.018</strong></span>
-              <input id="viscosityRange" type="range" min="0.01" max="0.04" step="0.001" />
+              <span>粘性 <strong id="viscosityValue">0.016</strong></span>
+              <input id="viscosityRange" type="range" min="0.009" max="0.03" step="0.001" />
             </label>
 
             <label class="field">
-              <span>円柱径 <strong id="diameterValue">24</strong></span>
-              <input id="diameterRange" type="range" min="16" max="34" step="1" />
+              <span>円柱径 <strong id="diameterValue">18</strong></span>
+              <input id="diameterRange" type="range" min="12" max="22" step="1" />
             </label>
 
             <label class="field">
-              <span>1フレームあたりの更新回数 <strong id="stepsValue">2</strong></span>
-              <input id="stepsRange" type="range" min="1" max="4" step="1" />
+              <span>spanwise seed <strong id="spanwiseSeedValue">0.0045</strong></span>
+              <input id="spanwiseSeedRange" type="range" min="0" max="0.012" step="0.0005" />
+            </label>
+
+            <label class="field">
+              <span>1フレームあたりの更新回数 <strong id="stepsValue">1</strong></span>
+              <input id="stepsRange" type="range" min="1" max="3" step="1" />
             </label>
           </section>
 
           <section>
-            <h2>表示</h2>
-            <div class="radio-group">
-              <label><input type="radio" name="viewMode" value="speed" />速度</label>
-              <label><input type="radio" name="viewMode" value="vorticity" checked />渦度</label>
+            <h2>断面と表示</h2>
+            <div class="radio-group stacked-group">
+              <label><input type="radio" name="slicePlane" value="xy" checked />XY</label>
+              <label><input type="radio" name="slicePlane" value="xz" />XZ</label>
+              <label><input type="radio" name="slicePlane" value="yz" />YZ</label>
             </div>
+
+            <label class="field">
+              <span>固定軸 <strong id="sliceAxisLabel">z</strong> の index <strong id="sliceValue">0</strong></span>
+              <input id="sliceRange" type="range" min="0" max="0" step="1" />
+            </label>
+
+            <div class="radio-group stacked-group">
+              <label><input type="radio" name="viewMode" value="speed" />速度</label>
+              <label><input type="radio" name="viewMode" value="vorticity" checked />法線渦度</label>
+              <label><input type="radio" name="viewMode" value="spanwise" />uz</label>
+            </div>
+
             <label class="checkbox-row">
               <input id="streamlineToggle" type="checkbox" checked />
               <span>流線オーバーレイ</span>
+            </label>
+
+            <label class="field">
+              <span>3D view の回転角 <strong id="volumeYawValue">-24°</strong></span>
+              <input id="volumeYawRange" type="range" min="-70" max="70" step="1" />
             </label>
           </section>
 
@@ -83,15 +107,32 @@
           <div class="viewer-header">
             <div>
               <h2>シミュレーション</h2>
-              <p>円柱後流の 2D 可視化</p>
+              <p>slice と volume preview を並べて 3D wake を確認します</p>
             </div>
             <div class="badge-row">
               <span class="badge" id="statusBadge">待機中</span>
               <span class="badge" id="reBadge">Re 0.0</span>
             </div>
           </div>
-          <canvas id="fieldCanvas" aria-label="流れ場の可視化"></canvas>
-          <canvas id="legendCanvas" width="260" height="28" aria-label="カラースケール"></canvas>
+
+          <div class="viewer-stack">
+            <div class="viewer-card">
+              <div class="section-headline viewer-headline">
+                <h3>slice view</h3>
+                <span id="sliceSummary">XY / z = 0</span>
+              </div>
+              <canvas id="fieldCanvas" aria-label="断面スライスの可視化"></canvas>
+              <canvas id="legendCanvas" width="320" height="28" aria-label="カラースケール"></canvas>
+            </div>
+
+            <div class="viewer-card">
+              <div class="section-headline viewer-headline">
+                <h3>3D wake view</h3>
+                <span>rotating axonometric preview</span>
+              </div>
+              <canvas id="volumeCanvas" width="720" height="340" aria-label="3D wake preview"></canvas>
+            </div>
+          </div>
         </section>
 
         <aside class="panel metrics-panel">
@@ -100,16 +141,18 @@
             <dl class="metric-list">
               <div><dt>Iteration</dt><dd id="iterationMetric">0</dd></div>
               <div><dt>Probe (uy)</dt><dd id="probeMetric">0.0000</dd></div>
+              <div><dt>Probe (uz)</dt><dd id="probeSpanMetric">0.0000</dd></div>
               <div><dt>平均速度</dt><dd id="averageSpeedMetric">0.0000</dd></div>
               <div><dt>最大速度</dt><dd id="maxSpeedMetric">0.0000</dd></div>
-              <div><dt>最大渦度</dt><dd id="maxVorticityMetric">0.0000</dd></div>
+              <div><dt>最大 |ω|</dt><dd id="maxVorticityMetric">0.0000</dd></div>
+              <div><dt>最大 |uz|</dt><dd id="maxSpanwiseMetric">0.0000</dd></div>
             </dl>
           </section>
 
           <section>
             <div class="section-headline">
               <h2>プローブ信号</h2>
-              <span>円柱後方の横速度</span>
+              <span>円柱後方の横速度 uy</span>
             </div>
             <canvas id="probeCanvas" width="320" height="160" aria-label="プローブ信号"></canvas>
           </section>
@@ -123,7 +166,7 @@
 
       <footer class="page-footer">
         <p>
-          詳細は README.md と docs/ を参照してください。これは教育用の 2D モデルであり、3D 乱流解析そのものを置き換えるものではありません。
+          詳細は README.md と docs/ を参照してください。これは compact な 3D 教育用モデルであり、格子独立性や高忠実度 3D CFD の代替を目的としたものではありません。
         </p>
       </footer>
     </div>

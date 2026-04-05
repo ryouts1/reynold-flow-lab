@@ -2,6 +2,7 @@ export function computeReynolds({ velocity, viscosity, diameter }) {
   if (!viscosity) {
     return 0;
   }
+
   return (velocity * diameter) / viscosity;
 }
 
@@ -13,31 +14,35 @@ export function formatNumber(value, digits = 1) {
   return Number.isFinite(value) ? value.toFixed(digits) : '—';
 }
 
-export function classifyRegime(reynolds) {
+export function classifyRegime(reynolds, maxSpanwiseSpeed) {
   if (reynolds < 40) {
     return {
-      title: '定常に近い後流',
+      title: '3D 格子でも後流はまだ穏やか',
       summary:
-        '低い Reynolds 数では、後流はおおむね対称のまま落ち着きます。円柱の後ろに小さな再循環域が見えても、交互渦放出はまだ強く出ません。',
-      caution: '2D 簡略モデルなので、境界条件の影響で完全な対称場にならない場合があります。',
+        '低めの Reynolds 数では、3D ソルバーにしても後流は大きく崩れません。XY 断面で円柱後流の基本形を確認し、XZ / YZ 断面で spanwise 方向の変化が弱いことを比較できます。',
+      caution:
+        'ここで見える spanwise 成分は小さく、3D らしさは限定的です。まずは断面の違いを掴むための基準ケースとして使うのが向いています。',
     };
   }
 
-  if (reynolds < 180) {
+  if (reynolds < 90) {
     return {
-      title: '周期的な渦放出が見えやすい領域',
+      title: '周期後流に 3D の揺らぎが乗りやすい領域',
       summary:
-        'この領域では、円柱後流に交互の渦が並ぶ Kármán 渦列が観察しやすくなります。プローブ信号もほぼ周期的に振動します。',
-      caution: '見た目は乱れていても、ここで観察しているのは 2D の周期後流です。3D 乱流そのものを直接解いているわけではありません。',
+        '交互渦放出が見えやすい条件に、spanwise seed を加えています。XY 断面では交互渦を、XZ / YZ 断面では z 方向に揺らぐ wake の形を追いやすくなります。',
+      caution:
+        'ここで見ている 3D 構造は、低解像度の教育用モデルで可視化しやすいように seed を入れて強調しています。定量評価より、断面差の理解を優先してください。',
     };
   }
 
   return {
-    title: '3D 遷移閾値の手前を眺める領域',
+    title: '3D wake を眺めやすい高めの設定',
     summary:
-      'Re がさらに上がると、実際の円柱後流は 3D 不安定化に近づきます。このプロジェクトでは、その手前の 2D wake がどう見えるかを定性的に確認します。',
+      'Reynolds 数を上げると、XZ / YZ 断面と volume preview で spanwise 方向の揺らぎが見えやすくなります。XY 断面だけでは分からない z 方向の厚みを確認するのに向いた領域です。',
     caution:
-      'このモデルは 2D D2Q9 LBM です。三次元の mode A / mode B や fully developed turbulence の再現は対象外です。',
+      maxSpanwiseSpeed < 1e-4
+        ? '数値的にまだほぼ 2D に近い状態です。step を進めるか、spanwise seed を少し上げると 3D 構造が見えやすくなります。'
+        : 'D3Q19 の小さな体積格子で動かす compact solver です。実務 CFD のような格子独立性や wake frequency の厳密評価は対象外です。',
   };
 }
 
@@ -46,5 +51,6 @@ export function summarizeMetrics(metrics) {
     averageSpeed: formatNumber(metrics.averageSpeed, 4),
     maxSpeed: formatNumber(metrics.maxSpeed, 4),
     maxAbsVorticity: formatNumber(metrics.maxAbsVorticity, 4),
+    maxSpanwiseSpeed: formatNumber(metrics.maxSpanwiseSpeed, 4),
   };
 }
